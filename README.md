@@ -3,8 +3,6 @@
 
 An **end-to-end data analytics project** analyzing **1.25 lakh+ Zomato food orders** to uncover insights related to **city performance, restaurant revenue, food item popularity, and customer spending behavior**.
 
-This project demonstrates **real-world data cleaning, SQL analysis, and interactive Power BI dashboard development**, suitable for **entry-level Data Analyst roles**.
-
 ---
 
 ## 📌 Project Overview
