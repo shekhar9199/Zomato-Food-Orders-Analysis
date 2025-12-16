@@ -1,0 +1,166 @@
+-- Creating table for dataset 
+
+CREATE TABLE zomato_orders (
+    city VARCHAR(100),
+    order_item TEXT,
+    order_restaurant VARCHAR(255),
+    order_value DECIMAL(10,2),
+    food_item VARCHAR(150)
+);
+
+
+-- Checking loaded dataset
+select * from zomato_orders
+
+-- Total Records
+SELECT COUNT(*) FROM zomato_orders;
+
+-- checking sample data
+SELECT * FROM zomato_orders
+LIMIT 10;
+
+-- checking null values
+SELECT COUNT(*) 
+FROM zomato_orders
+WHERE order_value IS NULL;
+
+
+-- ANSWERING BUSINESS PROBLEMS
+
+-- Q1. Total Orders & Total Revenue
+SELECT 
+    COUNT(*) AS total_orders,
+    SUM(order_value) AS total_revenue
+FROM zomato_orders;
+
+-- Q2. City-wise Order Count
+SELECT 
+    city,
+    COUNT(*) AS total_orders
+FROM zomato_orders
+GROUP BY city
+ORDER BY total_orders DESC;
+
+-- Q3. City-wise Revenue
+SELECT 
+    city,
+    SUM(order_value) AS revenue
+FROM zomato_orders
+GROUP BY city
+ORDER BY revenue DESC;
+
+-- Q4. Top 10 Restaurants by Revenue
+SELECT 
+    order_restaurant,
+    SUM(order_value) AS revenue
+FROM zomato_orders
+GROUP BY order_restaurant
+ORDER BY revenue DESC
+LIMIT 10;
+
+-- Q5. Most Popular Food Items
+SELECT 
+    food_item,
+    COUNT(*) AS order_count
+FROM zomato_orders
+GROUP BY food_item
+ORDER BY order_count DESC
+LIMIT 10;
+
+-- Average Order Value (AOV)
+SELECT 
+    ROUND(AVG(order_value),2) AS avg_order_value
+FROM zomato_orders;
+
+-- Which cities have high orders but low revenue?
+SELECT 
+    city,
+    COUNT(*) AS total_orders,
+    ROUND(SUM(order_value),2) AS total_revenue,
+    ROUND(AVG(order_value),2) AS avg_order_value
+FROM zomato_orders
+GROUP BY city
+ORDER BY total_orders DESC;
+
+-- Contribution % of Top Cities
+SELECT 
+    city,
+    ROUND(SUM(order_value),2) AS city_revenue,
+    ROUND(
+        SUM(order_value) * 100 / 
+        (SELECT SUM(order_value) FROM zomato_orders),
+        2
+    ) AS revenue_percentage
+FROM zomato_orders
+GROUP BY city
+ORDER BY city_revenue DESC;
+
+-- Top Restaurants by Order Volume (Not Revenue)
+SELECT 
+    order_restaurant,
+    COUNT(*) AS total_orders
+FROM zomato_orders
+GROUP BY order_restaurant
+ORDER BY total_orders DESC
+LIMIT 10;
+
+-- High-Value Food Items (Revenue Based)
+SELECT 
+    food_item,
+    ROUND(SUM(order_value),2) AS revenue
+FROM zomato_orders
+GROUP BY food_item
+ORDER BY revenue DESC
+LIMIT 10;
+
+-- Orders with Missing Price (Data Quality)
+SELECT 
+    COUNT(*) AS missing_price_orders
+FROM zomato_orders
+WHERE order_value IS NULL;
+
+-- Cities with Highest AOV
+SELECT 
+    city,
+    ROUND(AVG(order_value),2) AS avg_order_value
+FROM zomato_orders
+GROUP BY city
+ORDER BY avg_order_value DESC;
+
+-- Rank Cities by Revenue (WINDOW FUNCTION)
+SELECT 
+    city,
+    ROUND(SUM(order_value),2) AS revenue,
+    RANK() OVER (ORDER BY SUM(order_value) DESC) AS revenue_rank
+FROM zomato_orders
+GROUP BY city;
+
+
+
+-- SQL SHELL 
+/*
+I faced delimiter conflicts while importing CSV data with commas inside text fields.
+I resolved it by switching to a pipe-delimited format and explicitly defining import parameters.
+
+util.importTable(
+  "C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/zomato_cleaned_pipe.csv",
+  {
+    table: "zomato_orders",
+    fieldsTerminatedBy: "|",
+    fieldsEnclosedBy: "\"",
+    linesTerminatedBy: "\n",
+    skipRows: 1
+  }
+); 
+
+I Have handled real-world messy data?
+
+Yes, While importing a large CSV into MySQL, 
+I faced delimiter and encoding issues due to commas in text fields.
+I resolved it by exporting a pipe-delimited file from Python and explicitly defining 
+import parameters in MySQL.
+
+
+*/
+
+
